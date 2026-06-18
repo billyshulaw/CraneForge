@@ -318,33 +318,43 @@ button{font-family:'Inter',sans-serif}
 .mk-chip.placed::before{content:'●';color:var(--teal);font-size:8px}
 .help{position:fixed;inset:0;background:rgba(8,11,18,.82);z-index:1000;display:none;align-items:center;justify-content:center;padding:24px}
 .help.show{display:flex}
+/* PROJECT TABS */
+.tabbar{flex-shrink:0;display:flex;align-items:center;gap:4px;padding:5px 12px 0 12px;background:#0c1220;border-bottom:1px solid var(--edge);overflow-x:auto}
+.proj-tab{display:flex;align-items:center;gap:7px;padding:6px 11px;border-radius:8px 8px 0 0;background:var(--panel);border:1px solid var(--edge);border-bottom:none;cursor:pointer;max-width:200px;flex-shrink:0;position:relative;top:1px}
+.proj-tab.active{background:var(--panel2);border-color:var(--teal);box-shadow:0 -2px 0 var(--teal) inset}
+.proj-tab .pt-name{font:600 12px 'Inter';color:var(--ink-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.proj-tab.active .pt-name{color:var(--ink)}
+.proj-tab .pt-x{background:none;border:none;color:var(--ink-dim);font-size:11px;cursor:pointer;padding:0 2px;border-radius:4px;flex-shrink:0}
+.proj-tab .pt-x:hover{color:var(--hot);background:rgba(255,61,127,.12)}
+.proj-add{font:700 11.5px 'Inter';padding:6px 11px;border-radius:8px;border:1px dashed var(--edge);background:none;color:var(--teal);cursor:pointer;flex-shrink:0;margin-left:2px}
+.proj-add:hover{border-color:var(--teal);background:rgba(34,211,197,.08)}
 /* MERCH ROOM */
 .artbin{flex-shrink:0;background:linear-gradient(180deg,#1a2336,#10182a);border-bottom:1px solid var(--edge);border-left:3px solid var(--teal);position:relative}
 .artbin::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--teal),var(--gold));box-shadow:0 0 10px rgba(34,211,197,.6)}
-.artbin-head{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;user-select:none}
-.artbin-toggle{color:var(--teal);font-size:13px;transition:transform .15s;flex-shrink:0}
+.artbin-head{display:flex;align-items:center;gap:9px;padding:7px 16px;cursor:pointer;user-select:none}
+.artbin-toggle{color:var(--teal);font-size:12px;transition:transform .15s;flex-shrink:0}
 .artbin.open .artbin-toggle{transform:rotate(90deg)}
-.artbin-title{font-family:'Space Grotesk';font-weight:700;font-size:15px;color:var(--ink);letter-spacing:.01em}
-.artbin-count{font-size:12px;color:#04211f;font-weight:800;background:var(--gold);border-radius:20px;padding:1px 9px;min-width:22px;text-align:center}
+.artbin-title{font-family:'Space Grotesk';font-weight:700;font-size:13.5px;color:var(--ink);letter-spacing:.01em}
+.artbin-count{font-size:11px;color:#04211f;font-weight:800;background:var(--gold);border-radius:20px;padding:1px 8px;min-width:20px;text-align:center}
 .artbin-count:empty{display:none}
-.artbin-hint{font-size:12px;color:var(--ink-dim);margin-left:4px}
-.artbin-add{margin-left:auto;font:700 12px 'Inter';padding:7px 14px;border-radius:8px;border:1px solid transparent;background:linear-gradient(135deg,var(--teal),#15a89c);color:#04211f;cursor:pointer;flex-shrink:0;box-shadow:0 2px 8px rgba(34,211,197,.25)}
+.artbin-hint{font-size:11.5px;color:var(--ink-dim);margin-left:4px}
+.artbin-add{margin-left:auto;font:700 11.5px 'Inter';padding:6px 13px;border-radius:8px;border:1px solid transparent;background:linear-gradient(135deg,var(--teal),#15a89c);color:#04211f;cursor:pointer;flex-shrink:0;box-shadow:0 2px 8px rgba(34,211,197,.25)}
 .artbin-add:hover{filter:brightness(1.08)}
-.artbin-body{display:none;padding:0 16px 14px 16px}
+.artbin-body{display:none;padding:0 16px 10px 16px}
 .artbin.open .artbin-body{display:block}
 .artbin.dragover{outline:2px dashed var(--teal);outline-offset:-4px;background:rgba(34,211,197,.06)}
-.artbin-strip{display:flex;gap:9px;overflow-x:auto;padding:6px 2px 8px 2px}
-.artbin-empty{color:var(--ink-dim);font-size:12.5px;padding:12px 2px}
+.artbin-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 6px 2px}
+.artbin-empty{color:var(--ink-dim);font-size:12px;padding:9px 2px}
 /* first-load attention pulse on the whole bar (does not auto-open) */
 @keyframes merch-glow{0%,100%{box-shadow:inset 0 0 0 rgba(34,211,197,0)}50%{box-shadow:inset 0 0 30px rgba(34,211,197,.18)}}
 .artbin.attn{animation:merch-glow 1.6s ease-in-out 3}
-.abi{position:relative;width:66px;height:66px;border-radius:9px;border:1px solid var(--edge);background:var(--check);flex-shrink:0;cursor:grab;overflow:hidden;transition:transform .1s,border-color .1s}
+.abi{position:relative;width:58px;height:58px;border-radius:8px;border:1px solid var(--edge);background:var(--check);flex-shrink:0;cursor:grab;overflow:hidden;transition:transform .1s,border-color .1s}
 .abi:hover{transform:translateY(-2px);border-color:var(--teal)}
 .abi:active{cursor:grabbing}
 .abi img{width:100%;height:100%;object-fit:cover;pointer-events:none}
-.abi .abi-x{position:absolute;top:2px;right:2px;width:17px;height:17px;border-radius:50%;background:rgba(8,11,18,.82);color:#fff;border:none;font-size:10px;line-height:17px;text-align:center;cursor:pointer;padding:0;opacity:0;transition:opacity .12s}
+.abi .abi-x{position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(8,11,18,.82);color:#fff;border:none;font-size:10px;line-height:16px;text-align:center;cursor:pointer;padding:0;opacity:0;transition:opacity .12s}
 .abi:hover .abi-x{opacity:1}
-.abi-ghost{position:fixed;width:66px;height:66px;border-radius:9px;overflow:hidden;pointer-events:none;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.5);opacity:.9}
+.abi-ghost{position:fixed;width:58px;height:58px;border-radius:8px;overflow:hidden;pointer-events:none;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.5);opacity:.9}
 .abi-ghost img{width:100%;height:100%;object-fit:cover}
 .slot.bin-target{outline:2px solid var(--teal);outline-offset:2px}
 .help-box{background:var(--panel);border:1px solid var(--edge);border-radius:16px;max-width:560px;width:100%;padding:28px;max-height:85vh;overflow-y:auto}
@@ -418,7 +428,7 @@ kbd{background:var(--bg);border:1px solid var(--edge);border-radius:4px;padding:
 <!-- KIT BAR -->
 <div class="kitbar">
   <span class="kl">Kit</span>
-  <input type="text" class="kf kf-name" id="kitName" placeholder="e.g. Sushi Plush — Machine 3" autocomplete="off">
+  <input type="text" class="kf kf-name" id="kitName" placeholder="e.g. Sushi Plush — Machine 3" autocomplete="off" oninput="if(projects[activeProj])projects[activeProj].name=this.value;renderTabs()">
   <div class="kg"><span class="kl">DPI</span><input type="number" class="kf kf-num" id="dpiInput" value="300" min="72" max="2400" oninput="onDPIChange(this.value)"></div>
   <div class="kg"><span class="kl">Printer</span>
     <select class="kf kf-preset" id="printerPreset" onchange="applyPreset(this.value)">
@@ -440,6 +450,9 @@ kbd{background:var(--bg);border:1px solid var(--edge);border-radius:4px;padding:
     <span class="fit" id="fitBadge">–</span>
   </div>
 </div>
+
+<!-- PROJECT TABS -->
+<div class="tabbar" id="tabBar"></div>
 
 <!-- MERCH ROOM (collapsible pasteboard for staging extra images) -->
 <div class="artbin" id="artBin">
@@ -806,6 +819,118 @@ const KV={
 
 /* UNDO/REDO */
 let history=[],hptr=-1,suppress=false;
+
+/* ═══ PROJECTS / TABS ═══ */
+// Each tab is a full independent project. The live globals (panels/state/artBin/etc.)
+// always hold the ACTIVE project; projects[] stores serialized snapshots of the others.
+let projects=[]; // [{id, name, data, history, hptr}]
+let activeProj=0;
+let projSeq=1;
+const MAX_TABS=6;
+// capture the current live globals into a plain object
+function captureProject(){
+  return {
+    panels:JSON.parse(JSON.stringify(panels)),
+    state:JSON.parse(JSON.stringify(state)),
+    artBin:JSON.parse(JSON.stringify(artBin)),
+    globalDPI,
+    printW:parseFloat($('printW').value)||8.5,
+    printH:parseFloat($('printH').value)||11,
+    preset:$('printerPreset').value,
+    kitName:$('kitName').value
+  };
+}
+// load a captured project object back into the live globals
+function restoreProject(d){
+  panels=JSON.parse(JSON.stringify(d.panels||[]));
+  // wipe + refill state keys
+  Object.keys(state).forEach(k=>{state[k]={};});
+  if(d.state)Object.keys(d.state).forEach(k=>{state[k]=JSON.parse(JSON.stringify(d.state[k]||{}));});
+  artBin=JSON.parse(JSON.stringify(d.artBin||[]));
+  globalDPI=d.globalDPI||300;
+  // wipe crop cache; rebuilt below
+  Object.keys(cropCache).forEach(k=>delete cropCache[k]);
+  $('dpiInput').value=globalDPI;
+  $('printW').value=d.printW!=null?d.printW:8.5;
+  $('printH').value=d.printH!=null?d.printH:11;
+  if(d.preset)$('printerPreset').value=d.preset;
+  $('kitName').value=d.kitName||'';
+}
+// blank starter project data
+function blankProjectData(){
+  return {panels:JSON.parse(JSON.stringify(DEFAULT_PANELS)),state:{images:{},dims:{},pans:{},shapes:{},locks:{},edits:{},labels:{},ratioLock:{},crops:{}},artBin:[],globalDPI:300,printW:8.5,printH:11,preset:'8.5x11',kitName:''};
+}
+async function switchToProject(idx){
+  if(idx===activeProj)return;
+  // save current live state into its slot
+  projects[activeProj].data=captureProject();
+  projects[activeProj].history=history.slice();
+  projects[activeProj].hptr=hptr;
+  projects[activeProj].name=$('kitName').value||projects[activeProj].name;
+  // load target
+  activeProj=idx;
+  const pr=projects[idx];
+  suppress=true;
+  restoreProject(pr.data);
+  history=(pr.history&&pr.history.length)?pr.history.slice():[];
+  hptr=pr.hptr!=null?pr.hptr:-1;
+  for(const id of Object.keys(state.crops)){await rebuildCropCache(id);}
+  rebuildAll();renderArtBin();renderTabs();updateUndoButtons();
+  suppress=false;
+  if(!history.length)snapshot();
+}
+function newProject(){
+  if(projects.length>=MAX_TABS){toast(`Up to ${MAX_TABS} tabs at once — close one first`);return;}
+  // save current
+  projects[activeProj].data=captureProject();
+  projects[activeProj].history=history.slice();
+  projects[activeProj].hptr=hptr;
+  projects[activeProj].name=$('kitName').value||projects[activeProj].name;
+  // create blank
+  const pr={id:projSeq++,name:'',data:blankProjectData(),history:[],hptr:-1};
+  projects.push(pr);activeProj=projects.length-1;
+  suppress=true;restoreProject(pr.data);history=[];hptr=-1;suppress=false;
+  rebuildAll();renderArtBin();renderTabs();snapshot();
+  toast('New project tab');
+}
+function projectDirty(idx){
+  // a project counts as "has work" if it has any placed image or staged Merch Room art
+  const d=idx===activeProj?captureProject():projects[idx].data;
+  const hasImg=d&&d.state&&d.state.images&&Object.keys(d.state.images).length>0;
+  const hasBin=d&&d.artBin&&d.artBin.length>0;
+  return hasImg||hasBin;
+}
+function closeProject(idx){
+  if(projects.length<=1){toast('Keep at least one tab open');return;}
+  const doClose=()=>{
+    projects.splice(idx,1);
+    if(activeProj>=projects.length)activeProj=projects.length-1;
+    else if(idx<activeProj)activeProj--;
+    else if(idx===activeProj){/* activeProj now points at the next one */}
+    const pr=projects[activeProj];
+    suppress=true;restoreProject(pr.data);history=(pr.history||[]).slice();hptr=pr.hptr!=null?pr.hptr:-1;suppress=false;
+    Promise.all(Object.keys(state.crops).map(id=>rebuildCropCache(id))).then(()=>{rebuildAll();renderArtBin();renderTabs();updateUndoButtons();if(!history.length)snapshot();});
+  };
+  if(projectDirty(idx)){
+    if(confirm('Close this project tab? Unsaved work in it will be lost (use Save to File first to keep it).'))doClose();
+  }else doClose();
+}
+function renderTabs(){
+  const bar=$('tabBar');if(!bar)return;
+  bar.innerHTML='';
+  projects.forEach((pr,i)=>{
+    const name=(i===activeProj?($('kitName').value||pr.name):pr.name)||'Untitled';
+    const tab=document.createElement('div');
+    tab.className='proj-tab'+(i===activeProj?' active':'');
+    tab.innerHTML=`<span class="pt-name">${name||'Untitled'}</span>`+(projects.length>1?`<button class="pt-x" title="Close tab">✕</button>`:'');
+    tab.querySelector('.pt-name').addEventListener('click',()=>switchToProject(i));
+    const x=tab.querySelector('.pt-x');if(x)x.addEventListener('click',e=>{e.stopPropagation();closeProject(i);});
+    bar.appendChild(tab);
+  });
+  const add=document.createElement('button');add.className='proj-add';add.id='projAdd';add.textContent='+ New';add.title='New project tab';
+  add.addEventListener('click',newProject);
+  bar.appendChild(add);
+}
 function snapshot(){
   if(suppress)return;
   const snap=JSON.stringify({panels,state,globalDPI,artBin});
@@ -1456,7 +1581,7 @@ async function loadKitByName(name){
   try{const br=await KV.get(`bin:${name}`);if(br)artBin=JSON.parse(br)||[];}catch(e){}
   renderArtBin();$('kitName').value=name;
   for(const id of Object.keys(state.crops)){await rebuildCropCache(id);}
-  rebuildAll();history=[];hptr=-1;snapshot();toast(`Loaded "${name}"`);
+  if(projects[activeProj])projects[activeProj].name=name;rebuildAll();renderTabs();history=[];hptr=-1;snapshot();toast(`Loaded "${name}"`);
 }
 // apply a saved kit's metadata (shared by storage-load and file-load)
 function applyKitMeta(m){
@@ -1533,7 +1658,8 @@ function loadKitFromFile(file){
     $('kitName').value=m._template?'':(m.name||'');
     renderArtBin();
     for(const id of Object.keys(state.crops)){await rebuildCropCache(id);}
-    rebuildAll();history=[];hptr=-1;snapshot();
+    if(projects[activeProj])projects[activeProj].name=m._template?'':(m.name||'');
+    rebuildAll();renderTabs();history=[];hptr=-1;snapshot();
     toast(m._template?'Template loaded — drop in your art':`Loaded "${m.name}"`);
   };
   r.readAsText(file);
@@ -1776,7 +1902,10 @@ function rebuildAll(){buildPanels();buildPreviewNodes();initClips();refreshPrevi
 /* ═══ INIT ═══ */
 function init(){
   panels=JSON.parse(JSON.stringify(DEFAULT_PANELS));
-  buildSpec();buildPanels();buildPreviewNodes();initClips();loadLib();mkRefreshChips();
+  // first project tab
+  projects=[{id:projSeq++,name:'',data:null,history:[],hptr:-1}];
+  activeProj=0;
+  buildSpec();buildPanels();buildPreviewNodes();initClips();loadLib();mkRefreshChips();renderTabs();
   setTimeout(()=>{refreshPreview();updateGrid();updatePrintInfo();refreshFinished();snapshot();},60);
   // events
   $('btnSave').addEventListener('click',e=>{e.stopPropagation();$('btnSave').closest('.tb-menu').classList.toggle('open');});
