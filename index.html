@@ -1494,14 +1494,32 @@ function buildKitObject(includeArt){
   else{obj._template=true;}
   return obj;
 }
-function downloadKitFile(includeArt){
+async function downloadKitFile(includeArt){
   const obj=buildKitObject(includeArt);
   const slug=(obj.name||'kit').replace(/[^a-z0-9]+/gi,'-').toLowerCase();
   const suffix=includeArt?'':'-template';
-  const blob=new Blob([JSON.stringify(obj)],{type:'application/json'});
+  const filename=`${slug}${suffix}.craneforge`;
+  const json=JSON.stringify(obj);
+  const blob=new Blob([json],{type:'application/json'});
+  // Preferred: native Save-As dialog (Chrome/Edge on a server) — lets the user pick the folder
+  if(window.showSaveFilePicker){
+    try{
+      const handle=await window.showSaveFilePicker({
+        suggestedName:filename,
+        types:[{description:'CraneForge kit',accept:{'application/json':['.craneforge']}}]
+      });
+      const w=await handle.createWritable();await w.write(blob);await w.close();
+      toast(includeArt?'Kit file saved ✓':'Template saved ✓');
+      return;
+    }catch(e){
+      if(e&&e.name==='AbortError')return; // user cancelled the dialog — do nothing
+      // any other error: fall through to the download fallback below
+    }
+  }
+  // Fallback: download to the browser's Downloads folder
   const url=URL.createObjectURL(blob);const a=document.createElement('a');
-  a.href=url;a.download=`${slug}${suffix}.craneforge`;a.click();URL.revokeObjectURL(url);
-  toast(includeArt?'Kit file saved ✓':'Template saved ✓');
+  a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);
+  toast(includeArt?'Kit file saved to Downloads ✓':'Template saved to Downloads ✓');
 }
 function loadKitFromFile(file){
   const r=new FileReader();
