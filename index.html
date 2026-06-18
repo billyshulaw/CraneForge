@@ -108,6 +108,8 @@ button{font-family:'Inter',sans-serif}
 .left-head{flex-shrink:0;padding:11px 14px 9px;display:flex;align-items:center;justify-content:space-between}
 .left-title{font-family:'Space Grotesk';font-size:13px;font-weight:600;color:var(--ink-dim);letter-spacing:.04em}
 .add-btn{display:flex;align-items:center;gap:5px;height:28px;padding:0 11px;border-radius:7px;border:1px dashed var(--edge);background:transparent;color:var(--teal);font-weight:600;font-size:12px;cursor:pointer}
+.add-btn-btm{width:100%;justify-content:center;height:38px;margin-top:10px}
+.add-btn-btm:hover{border-color:var(--teal);background:rgba(34,211,197,.07)}
 .add-btn:hover{border-color:var(--teal);background:rgba(34,211,197,.07)}
 .panel-list{flex:1;overflow-y:auto;padding:0 14px 14px;display:flex;flex-wrap:wrap;gap:9px;align-content:flex-start}
 
@@ -318,6 +320,42 @@ button{font-family:'Inter',sans-serif}
 .mk-chip.placed::before{content:'●';color:var(--teal);font-size:8px}
 .help{position:fixed;inset:0;background:rgba(8,11,18,.82);z-index:1000;display:none;align-items:center;justify-content:center;padding:24px}
 .help.show{display:flex}
+/* ENLARGED SHEET PREVIEW — workstation: Merch Room on top, panel accordion left, fit-all preview right */
+.sheet-card{max-width:none;position:relative}
+/* normal (non-enlarged) mode: stage wrappers are transparent passthroughs, side hidden */
+.enlarge-side{display:none}
+.enlarge-stage,.enlarge-prev{display:block}
+.enlarge-backdrop{position:fixed;inset:0;background:rgba(8,11,18,.85);z-index:900;display:none}
+.enlarge-backdrop.show{display:block}
+#sheetWrap.enlarged{position:fixed;z-index:901;left:2vw;right:2vw;bottom:2vh;top:2vh;width:auto;height:auto;max-width:none;margin:0;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.6);border:1px solid var(--teal);padding:0}
+/* when Merch Room is docked above, start the box lower to leave room for the bar */
+body.enlarging #sheetWrap.enlarged{top:72px}
+#sheetWrap.enlarged .phint{flex-shrink:0;padding:12px 16px 8px 16px}
+#sheetWrap.enlarged .enlarge-stage{flex:1;display:flex;min-height:0;overflow:hidden}
+#sheetWrap.enlarged .enlarge-side{display:block;width:210px;flex-shrink:0;overflow-y:auto;border-right:1px solid var(--edge);padding:8px;background:var(--bg)}
+#sheetWrap.enlarged .enlarge-prev{flex:1;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:6px}
+#sheetWrap.enlarged .grid{margin:auto}
+.enlarge-close{position:absolute;bottom:14px;right:16px;z-index:910;background:var(--panel2);border:1px solid var(--teal);color:var(--ink);font:700 13px 'Inter';padding:9px 16px;border-radius:9px;cursor:pointer;display:none;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+#sheetWrap.enlarged .enlarge-close{display:block}
+.enlarge-close:hover{background:var(--teal);color:#04211f}
+/* left accordion chips */
+.enlarge-side .esc-title{font:700 10px 'Inter';letter-spacing:.07em;text-transform:uppercase;color:var(--ink-dim);margin:2px 4px 7px}
+.epchip{display:flex;align-items:center;gap:7px;padding:5px 9px;border-radius:7px;border:1px solid var(--edge);background:var(--panel);margin-bottom:4px;cursor:pointer;font:600 11.5px 'Inter';color:var(--ink-dim)}
+.epchip:hover{border-color:var(--teal);color:var(--ink)}
+.epchip.active{border-color:var(--teal);color:var(--ink);background:var(--panel2)}
+.epchip .epc-dot{width:15px;height:15px;border-radius:4px;background:var(--hot);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.epchip .epc-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.epchip .epc-chev{margin-left:auto;font-size:9px;color:var(--teal)}
+.ep-host{margin:0 0 6px 0}
+/* the relocated live panel card sits in the host; neutralize its outer card chrome */
+.ep-host .slot{margin:0}
+/* docked Merch Room above the box */
+body.enlarging .artbin{position:fixed;left:2vw;right:2vw;top:2vh;z-index:903;border-radius:12px;border:1px solid var(--teal);box-shadow:0 6px 20px rgba(0,0,0,.4)}
+/* slimmer when expanded in enlarge mode: tighter padding + smaller thumbs */
+body.enlarging .artbin .artbin-head{padding:5px 16px}
+body.enlarging .artbin .artbin-body{padding:0 16px 7px 16px}
+body.enlarging .artbin .abi{width:46px;height:46px}
+body.enlarging .artbin .artbin-strip{padding:2px 2px 3px 2px;gap:6px}
 /* PROJECT TABS */
 .tabbar{flex-shrink:0;display:flex;align-items:center;gap:4px;padding:5px 12px 0 12px;background:#0c1220;border-bottom:1px solid var(--edge);overflow-x:auto}
 .proj-tab{display:flex;align-items:center;gap:7px;padding:6px 11px;border-radius:8px 8px 0 0;background:var(--panel);border:1px solid var(--edge);border-bottom:none;cursor:pointer;max-width:200px;flex-shrink:0;position:relative;top:1px}
@@ -357,6 +395,32 @@ button{font-family:'Inter',sans-serif}
 .abi-ghost{position:fixed;width:58px;height:58px;border-radius:8px;overflow:hidden;pointer-events:none;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.5);opacity:.9}
 .abi-ghost img{width:100%;height:100%;object-fit:cover}
 .slot.bin-target{outline:2px solid var(--teal);outline-offset:2px}
+.sp.focus-panel{outline:2px solid var(--gold);outline-offset:1px}
+/* SLIDE-OUT LINKS TRAY (right edge of Export card) */
+.export-card{position:relative}
+.links-tab{position:absolute;top:18px;right:-38px;width:38px;height:62px;border:1px solid var(--edge);border-left:none;border-radius:0 12px 12px 0;background:linear-gradient(180deg,#1a2336,#141b2b);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:3px 0 12px rgba(0,0,0,.3);z-index:20}
+.links-tab:hover{background:var(--panel2)}
+.links-tab-cube{width:26px;height:26px;display:block}
+.links-tray{position:absolute;top:0;right:0;height:100%;width:0;overflow:hidden;background:var(--panel2);border-radius:0 14px 14px 0;transition:width .22s ease;z-index:21;box-shadow:-8px 0 28px rgba(0,0,0,.4)}
+.export-card.links-open .links-tray{width:280px;border:1px solid var(--teal)}
+.export-card.links-open .links-tab{right:-38px;opacity:0;pointer-events:none}
+.links-tray-head{display:flex;align-items:center;padding:14px 16px 10px;gap:8px}
+.lt-title{font-family:'Space Grotesk';font-weight:700;font-size:14px;color:var(--ink)}
+.lt-close{margin-left:auto;background:none;border:none;color:var(--ink-dim);font-size:14px;cursor:pointer;padding:2px 6px;border-radius:6px}
+.lt-close:hover{color:var(--hot);background:rgba(255,61,127,.12)}
+.links-list{padding:0 12px;display:flex;flex-direction:column;gap:6px;max-height:calc(100% - 150px);overflow-y:auto}
+.link-item{display:flex;align-items:center;gap:8px;padding:9px 11px;border-radius:8px;border:1px solid var(--edge);background:var(--panel);color:var(--ink);font:600 12.5px 'Inter';text-decoration:none;cursor:pointer;white-space:nowrap}
+.link-item:hover{border-color:var(--teal);color:var(--teal)}
+.link-item .li-ico{flex-shrink:0;color:var(--teal)}
+.link-item .li-name{overflow:hidden;text-overflow:ellipsis}
+.link-item .li-fixed{margin-left:auto;font-size:9px;color:var(--ink-dim);font-weight:500;text-transform:uppercase;letter-spacing:.05em}
+.link-item .li-del{margin-left:auto;background:none;border:none;color:var(--ink-dim);font-size:11px;cursor:pointer;padding:0 3px;border-radius:4px;flex-shrink:0}
+.link-item .li-del:hover{color:var(--hot)}
+.links-add-row{display:flex;flex-wrap:wrap;gap:6px;padding:12px}
+.link-in{flex:1;min-width:0;background:var(--bg);border:1px solid var(--edge);border-radius:7px;padding:7px 9px;color:var(--ink);font:500 12px 'Inter'}
+.link-in:focus{outline:none;border-color:var(--teal)}
+.link-add-btn{background:linear-gradient(135deg,var(--teal),#15a89c);color:#04211f;border:none;border-radius:7px;padding:7px 12px;font:700 12px 'Inter';cursor:pointer}
+.links-hint{padding:0 12px 12px;font-size:10.5px;color:var(--ink-dim)}
 .help-box{background:var(--panel);border:1px solid var(--edge);border-radius:16px;max-width:560px;width:100%;padding:28px;max-height:85vh;overflow-y:auto}
 .help-box h2{font-family:'Space Grotesk';font-size:22px;margin-bottom:6px;color:var(--ink)}
 .help-box h2 .g{color:var(--gold)}
@@ -453,6 +517,7 @@ kbd{background:var(--bg);border:1px solid var(--edge);border-radius:4px;padding:
 
 <!-- PROJECT TABS -->
 <div class="tabbar" id="tabBar"></div>
+<div class="enlarge-backdrop" id="enlargeBackdrop"></div>
 
 <!-- MERCH ROOM (collapsible pasteboard for staging extra images) -->
 <div class="artbin" id="artBin">
@@ -475,18 +540,24 @@ kbd{background:var(--bg);border:1px solid var(--edge);border-radius:4px;padding:
   <div class="left">
     <div class="left-head">
       <span class="left-title">PANELS</span>
-      <button class="add-btn" id="btnAddPanel">+ Add panel</button>
     </div>
     <div class="panel-list" id="panelList"></div>
+    <button class="add-btn add-btn-btm" id="btnAddPanel">+ Add panel</button>
   </div>
 
   <!-- RIGHT -->
   <div class="right">
     <div style="width:100%">
-      <div class="rlbl">Sheet Preview <button class="expand-pop" id="btnPopup">⤢ View finished</button></div>
-      <div class="card" id="sheetWrap" style="max-width:none;position:relative">
+      <div class="rlbl">Sheet Preview <button class="expand-pop" id="btnEnlarge">⛶ Enlarge</button> <button class="expand-pop" id="btnPopup">⤢ View finished</button></div>
+      <div class="card sheet-card" id="sheetWrap">
+        <button class="enlarge-close" id="enlargeClose">✕ Close</button>
         <div class="phint"><strong>Drag ⤡</strong> resize · <strong>Drag image</strong> reposition · <strong>Dbl-click</strong> center · <strong>Drag the ⠿ handle</strong> to swap panels · 🔒 lock</div>
-        <div class="grid" id="sheetGrid"></div>
+        <div class="enlarge-stage" id="enlargeStage">
+          <div class="enlarge-side" id="enlargeSide"></div>
+          <div class="enlarge-prev" id="enlargePrev">
+            <div class="grid" id="sheetGrid"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -516,7 +587,7 @@ kbd{background:var(--bg);border:1px solid var(--edge);border-radius:4px;padding:
       <div class="pir"><span class="pi-l">At <span id="piDPI">300</span> DPI:</span><span class="pi-n" id="piNote">Set your machine dimensions to see fit status.</span></div>
     </div>
 
-    <div class="card">
+    <div class="card export-card" id="exportCard">
       <div class="rlbl">Export Options</div>
       <div class="eo-grid">
         <label class="eo"><input type="checkbox" id="optPanels" checked><div><div class="t">📄 Individual Panels</div><div class="d">Each panel as its own PNG at full print resolution</div></div></label>
@@ -527,6 +598,24 @@ kbd{background:var(--bg);border:1px solid var(--edge);border-radius:4px;padding:
         <label class="eo"><input type="checkbox" id="optPdf"><div><div class="t">📕 Print-Ready PDF</div><div class="d">One PDF, each panel on its own page at true print size — hand to a print shop</div></div></label>
       </div>
       <button class="zipbtn" id="btnZip">⬇ Download ZIP</button>
+
+      <!-- SLIDE-OUT LINKS TRAY -->
+      <button class="links-tab" id="linksTab" title="Quick links">
+        <img class="links-tab-cube" src="data:image/png;base64,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" alt="Links">
+      </button>
+      <div class="links-tray" id="linksTray">
+        <div class="links-tray-head">
+          <span class="lt-title">Quick Links</span>
+          <button class="lt-close" id="linksClose" title="Close">✕</button>
+        </div>
+        <div class="links-list" id="linksList"></div>
+        <div class="links-add-row">
+          <input type="text" id="linkName" class="link-in" placeholder="Name (e.g. Vendor)" autocomplete="off">
+          <input type="text" id="linkUrl" class="link-in" placeholder="https://…" autocomplete="off">
+          <button class="link-add-btn" id="linkAdd">+ Add</button>
+        </div>
+        <div class="links-hint">Your added links save in this browser.</div>
+      </div>
     </div>
 
     <div style="width:100%;max-width:600px">
@@ -607,7 +696,7 @@ kbd{background:var(--bg);border:1px solid var(--edge);border-radius:4px;padding:
         <ul>
           <li><b>Upload art:</b> click a panel's image area and choose your file. Click <b>Replace</b> on a filled panel to swap it.</li>
           <li><b>Rename a panel:</b> click its name and type. Useful when a machine's layout doesn't match the defaults.</li>
-          <li><b>Add a panel:</b> <span class="pill">+ Add panel</span> at the top for extra pieces.</li>
+          <li><b>Add a panel:</b> <span class="pill">+ Add panel</span> beneath the panel list for extra pieces.</li>
           <li><b>Remove:</b> the 🗑 deletes a custom panel; ✕ clears just the image.</li>
           <li><b>Collapse:</b> the ▲ on each panel folds it up to reduce clutter.</li>
         </ul>
@@ -736,6 +825,7 @@ kbd{background:var(--bg);border:1px solid var(--edge);border-radius:4px;padding:
           <li><b>Print-Ready PDF</b> — one PDF with each panel on its own page, sized to its true print dimensions. Hand this straight to a print shop — every page is already the right size.</li>
         </ul>
         <div class="warn">ZIP and PDF export need an internet connection (they load helper libraries). Everything else in CraneForge works fully offline.</div>
+        <p style="margin-top:10px"><b>Quick Links tray:</b> the FEG-cube tab on the right edge of the Export box slides out a list of company links (ERP, Mail, P/Hub) that open in a new tab. Add your own links (vendors, references) with <b>+ Add</b> — they save in your browser.</p>
       </div>
     </details>
 
@@ -752,6 +842,32 @@ kbd{background:var(--bg);border:1px solid var(--edge);border-radius:4px;padding:
         <div class="tip">Workflow tip: build one perfect layout for each machine you wrap, <b>Save as Template</b>, and reuse it for every seasonal theme. Save finished jobs with <b>Save to File</b> so they're archived and shareable.</div>
         <div class="warn">The in-app library uses this browser's storage, which has a size limit — image-heavy kits may not fit. <b>Save to File</b> has no limit and is the safer choice for big kits or anything you need to keep.</div>
         <p style="margin-top:10px"><kbd>Ctrl</kbd>+<kbd>Z</kbd> undo · <kbd>Ctrl</kbd>+<kbd>Y</kbd> redo (50 steps) · <kbd>Esc</kbd> closes any popup.</p>
+      </div>
+    </details>
+
+    <details class="sop-sec">
+      <summary>13 · Project tabs <span class="sop-num">several kits at once</span></summary>
+      <div class="sop-body">
+        <p>The tab bar (above the Merch Room) lets you keep <b>several projects open at once</b> and switch instantly:</p>
+        <ul>
+          <li><b>+ New</b> opens a fresh blank project — its own panels, art, Merch Room, sizes, everything.</li>
+          <li><b>Click a tab</b> to switch to that project. The tab shows the kit name as you type it.</li>
+          <li><b>✕</b> closes a tab (warns first if it has art). Up to 6 tabs at once.</li>
+        </ul>
+        <div class="warn">Tabs are your live working set — they don't survive closing the browser on their own. To keep a project, use <b>Save to File</b> or <b>Save Kit</b>.</div>
+      </div>
+    </details>
+
+    <details class="sop-sec">
+      <summary>14 · Enlarge workstation <span class="sop-num">big editable view</span></summary>
+      <div class="sop-body">
+        <p><span class="pill">⛶ Enlarge</span> (by the Sheet Preview) opens a full-screen editable workspace:</p>
+        <ul>
+          <li><b>Merch Room</b> docks across the top — drag art straight onto panels in the big view.</li>
+          <li><b>Panel list down the left</b> — click a panel to expand its Edit Image controls and W/H sizing right there, one at a time.</li>
+          <li><b>The preview fills the rest</b>, fit to screen with everything visible.</li>
+          <li>Close with the <b>✕ Close</b> button (bottom-right), the backdrop, or <kbd>Esc</kbd>.</li>
+        </ul>
       </div>
     </details>
 
@@ -1085,12 +1201,62 @@ function toggleEditTray(id){if(editOpen.has(id))editOpen.delete(id);else editOpe
 
 /* ═══ ADD / DELETE PANEL ═══ */
 let customCount=0;
-function addPanel(){customCount++;const id='custom'+customCount;panels.push({id,label:'Custom Panel '+customCount,w:1200,h:1200,shape:'rect'});snapshot();buildPanels();buildPreviewNodes();initClips();refreshPreview();updateGrid();updatePrintInfo();buildSpec();const s=$(`slot-${id}`);if(s)setTimeout(()=>s.scrollIntoView({behavior:'smooth',block:'center'}),60);toast('Panel added');}
+const MAX_PANELS=12; // 7 standard + up to 5 custom — covers any real crane layout
+function addPanel(){
+  if(panels.length>=MAX_PANELS){toast(`A crane kit holds up to ${MAX_PANELS} panels — that covers any real machine`);return;}
+  customCount++;const id='custom'+customCount;panels.push({id,label:'Custom Panel '+customCount,w:1200,h:1200,shape:'rect'});snapshot();buildPanels();buildPreviewNodes();initClips();refreshPreview();updateGrid();updatePrintInfo();buildSpec();const s=$(`slot-${id}`);if(s)setTimeout(()=>s.scrollIntoView({behavior:'smooth',block:'center'}),60);toast('Panel added');
+}
 function deletePanel(id){if(FIXED_LAYOUT.includes(id)){toast('Default panels can\'t be deleted — lock or clear instead');return;}panels=panels.filter(p=>p.id!==id);['images','dims','pans','shapes','locks','edits','labels'].forEach(k=>delete state[k][id]);snapshot();buildPanels();buildPreviewNodes();initClips();refreshPreview();updateGrid();updatePrintInfo();buildSpec();toast('Panel deleted');}
 function renameLabel(id,el){state.labels[id]=el.textContent.trim()||P(id).label;snapshot();buildSpec();}
 
 /* ═══ BUILD PANEL CARDS ═══ */
+/* ═══ ENLARGE PANEL ACCORDION (left column) ═══ */
+let enlargeActivePanel=null; // panel id whose live card is currently relocated
+function buildEnlargeSide(){
+  const side=$('enlargeSide');if(!side)return;
+  enlargeActivePanel=null;
+  let html='<div class="esc-title">Panels — click to edit</div>';
+  panels.forEach((p,idx)=>{
+    html+=`<div class="epchip" id="epchip-${p.id}" onclick="selectEnlargePanel('${p.id}')"><span class="epc-dot">${idx+1}</span><span class="epc-name">${getLabel(p)}</span><span class="epc-chev">▸</span></div>`+
+          `<div class="ep-host" id="ephost-${p.id}"></div>`;
+  });
+  side.innerHTML=html;
+}
+function returnEnlargePanelCard(){
+  // move any relocated card back to the main panel list in correct order
+  if(!enlargeActivePanel)return;
+  const card=$(`slot-${enlargeActivePanel}`);
+  const list=$('panelList');
+  if(card&&list){
+    const idx=panels.findIndex(p=>p.id===enlargeActivePanel);
+    const ref=list.children[idx]||null;
+    list.insertBefore(card,ref);
+  }
+  enlargeActivePanel=null;
+}
+function selectEnlargePanel(id){
+  if(id===enlargeActivePanel){ // toggle closed
+    returnEnlargePanelCard();
+    document.querySelectorAll('.epchip').forEach(c=>c.classList.remove('active'));
+    document.querySelectorAll('.epc-chev').forEach(c=>c.textContent='▸');
+    return;
+  }
+  returnEnlargePanelCard();
+  const host=$(`ephost-${id}`),card=$(`slot-${id}`);
+  if(host&&card){
+    host.appendChild(card);
+    if(!expanded.has(id)){expanded.add(id);const s=card;s.classList.add('expanded');const c=$(`chev-${id}`);if(c)c.textContent='▲';}
+    enlargeActivePanel=id;
+  }
+  document.querySelectorAll('.epchip').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.epc-chev').forEach(c=>c.textContent='▸');
+  const chip=$(`epchip-${id}`);if(chip){chip.classList.add('active');const ch=chip.querySelector('.epc-chev');if(ch)ch.textContent='▾';}
+}
+
 function buildPanels(){
+  // if a card is relocated into the enlarge accordion, remember it and restore after rebuild
+  const reactivate=enlargeActivePanel;
+  if(reactivate){const c=$(`slot-${reactivate}`);if(c&&c.parentElement&&c.parentElement.classList.contains('ep-host'))c.parentElement.removeChild(c);enlargeActivePanel=null;}
   const list=$('panelList');list.innerHTML='';
   panels.forEach((p,idx)=>{
     const has=!!state.images[p.id];
@@ -1136,10 +1302,51 @@ function buildPanels(){
     list.appendChild(el);
   });
   expanded.forEach(id=>{const s=$(`slot-${id}`);if(s)s.classList.add('expanded');const c=$(`chev-${id}`);if(c)c.textContent='▲';});
+  // reflect panel cap on the Add button
+  const addBtn=$('btnAddPanel');
+  if(addBtn){const atCap=panels.length>=MAX_PANELS;addBtn.style.opacity=atCap?'.4':'';addBtn.title=atCap?`Maximum ${MAX_PANELS} panels`:'';}
+  // if we were editing a panel in the enlarge accordion, move its fresh card back into the host
+  if(reactivate&&document.body.classList.contains('enlarging')){
+    const host=$(`ephost-${reactivate}`),card=$(`slot-${reactivate}`);
+    if(host&&card){host.appendChild(card);enlargeActivePanel=reactivate;}
+  }
 }
 
 function triggerUpload(id){if(isLocked(id))return;$(`file-${id}`).click();}
 function handleFile(e,id){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{state.images[id]=r.result;delete state.crops[id];delete cropCache[id];snapshot();buildPanels();refreshPreview();};r.readAsDataURL(f);}
+
+/* ═══ QUICK LINKS TRAY ═══ */
+const FIXED_LINKS=[
+  {name:'ERP',url:'https://system.fegllc.com/'},
+  {name:'Mail',url:'https://mail.google.com'},
+  {name:'P/Hub',url:'https://account.systemfeg.com/'}
+];
+let userLinks=[];
+async function loadUserLinks(){
+  try{const r=await KV.get('quicklinks');if(r)userLinks=JSON.parse(r)||[];}catch(e){userLinks=[];}
+  renderLinks();
+}
+async function saveUserLinks(){try{await KV.set('quicklinks',JSON.stringify(userLinks));}catch(e){}}
+function renderLinks(){
+  const list=$('linksList');if(!list)return;
+  let html='';
+  FIXED_LINKS.forEach(l=>{
+    html+=`<a class="link-item" href="${l.url}" target="_blank" rel="noopener"><span class="li-ico">🔗</span><span class="li-name">${l.name}</span><span class="li-fixed">FEG</span></a>`;
+  });
+  userLinks.forEach((l,i)=>{
+    html+=`<a class="link-item" href="${l.url}" target="_blank" rel="noopener"><span class="li-ico">🔗</span><span class="li-name">${l.name}</span><button class="li-del" title="Remove" onclick="event.preventDefault();event.stopPropagation();removeUserLink(${i})">✕</button></a>`;
+  });
+  list.innerHTML=html;
+}
+function addUserLink(){
+  const n=$('linkName').value.trim();let u=$('linkUrl').value.trim();
+  if(!n||!u){toast('Enter a name and URL');return;}
+  if(!/^https?:\/\//i.test(u))u='https://'+u; // tolerate missing scheme
+  userLinks.push({name:n,url:u});saveUserLinks();renderLinks();
+  $('linkName').value='';$('linkUrl').value='';
+  toast('Link added');
+}
+function removeUserLink(i){userLinks.splice(i,1);saveUserLinks();renderLinks();}
 
 /* ═══ ART BIN (staging pasteboard) ═══ */
 let artBin=[]; // [{id, src}]
@@ -1230,11 +1437,33 @@ function buildPreviewNodes(){
 function updateGrid(){
   const wrap=$('sheetWrap'),grid=$('sheetGrid');if(!wrap||!grid)return;
   const GAP=5;
-  const availW=Math.min(wrap.clientWidth-28,860)-GAP*2; // account for 2 column gaps
+  const enlarged=wrap.classList.contains('enlarged');
+  const cap=enlarged?2400:860;
+  let availW=Math.min(wrap.clientWidth-28,cap)-GAP*2; // account for 2 column gaps
   const get=id=>panels.find(p=>p.id===id);
   const sl=get('sideLeft'),sr=get('sideRight'),mf=get('mainFront'),hd=get('header');
   const slW=sl?getW(sl):0,mfW=mf?getW(mf):availW,srW=sr?getW(sr):0;
   const totalW=slW+mfW+srW||1;
+  // when enlarged, also constrain by available HEIGHT so the whole layout fits with no scroll
+  if(enlarged){
+    const prevZone=$('enlargePrev');
+    const zoneW=prevZone?prevZone.clientWidth-10:availW;
+    const zoneH=prevZone?prevZone.clientHeight-10:600;
+    availW=Math.min(zoneW,cap);
+    const botPanelsH=panels.filter(p=>['badge','prizeOut','softTag'].includes(p.id)||!FIXED_LAYOUT.includes(p.id));
+    const botMaxH=Math.max(0,...botPanelsH.map(p=>getH(p)));
+    const centerH=(hd?getH(hd):0)+(mf?getH(mf):0);
+    const sideH=Math.max(sl?getH(sl):0,sr?getH(sr):0);
+    const layoutH=Math.max(sideH,centerH)+botMaxH+GAP*2;
+    const wScale=availW/totalW;
+    const hScale=zoneH/(layoutH||1);
+    let fit=Math.min(wScale,hScale);
+    // floor: never shrink below a usable size (~26 px per inch). Beyond this the preview scrolls.
+    const MIN_PPI=26;
+    const minScale=MIN_PPI/globalDPI; // scale is px-per-source-px; ppi = scale*globalDPI
+    if(fit<minScale)fit=minScale;
+    availW=totalW*fit;
+  }
   const scale=availW/totalW;
   grid.style.gridTemplateColumns=`${slW*scale}px ${mfW*scale}px ${srW*scale}px`;
   grid.style.maxWidth=(availW+GAP*2)+'px';
@@ -1267,7 +1496,13 @@ function refreshPreview(){
 }
 
 /* ═══ PAN / RESIZE ═══ */
-function startPan(e,id){if(e.target.classList.contains('rh')||e.target.classList.contains('swap-h'))return;const img=$(`pv-${id}`);if(!img||img.style.display==='none')return;e.preventDefault();const pn=state.pans[id]||{x:50,y:50};activePan={id,x0:e.clientX,y0:e.clientY,px0:pn.x,py0:pn.y};document.body.style.cursor='grabbing';}
+let lastFocusPanel=null;
+function setFocusPanel(id){
+  lastFocusPanel=id;
+  document.querySelectorAll('.sp.focus-panel').forEach(s=>s.classList.remove('focus-panel'));
+  const sp=document.querySelector(`[data-panel="${id}"]`);if(sp)sp.classList.add('focus-panel');
+}
+function startPan(e,id){if(e.target.classList.contains('rh')||e.target.classList.contains('swap-h'))return;setFocusPanel(id);const img=$(`pv-${id}`);if(!img||img.style.display==='none')return;e.preventDefault();const pn=state.pans[id]||{x:50,y:50};activePan={id,x0:e.clientX,y0:e.clientY,px0:pn.x,py0:pn.y};document.body.style.cursor='grabbing';}
 function resetPan(id){state.pans[id]={x:50,y:50};const img=$(`pv-${id}`);if(img)img.style.objectPosition='50% 50%';snapshot();}
 function startResize(e,id){e.preventDefault();e.stopPropagation();if(isLocked(id)){toast('Panel is locked 🔒');return;}const el=document.querySelector(`[data-panel="${id}"]`);if(!el)return;const rect=el.getBoundingClientRect();const cw=getW(P(id)),ch=getH(P(id));activeResize={id,wStart:cw,hStart:ch,x0:e.clientX,y0:e.clientY,scaleW:cw/rect.width,scaleH:ch/rect.height};document.body.style.cursor='se-resize';}
 
@@ -1927,6 +2162,26 @@ function init(){
   $('btnRedo').addEventListener('click',redo);
   $('btnHelp').addEventListener('click',()=>$('helpOverlay').classList.add('show'));
   $('helpClose').addEventListener('click',()=>$('helpOverlay').classList.remove('show'));
+  // Enlarge Sheet Preview (editable, in-page)
+  const toggleEnlarge=(on)=>{
+    const wrap=$('sheetWrap'),bd=$('enlargeBackdrop');
+    const want=on!==undefined?on:!wrap.classList.contains('enlarged');
+    wrap.classList.toggle('enlarged',want);
+    bd.classList.toggle('show',want);
+    document.body.classList.toggle('enlarging',want);
+    if(want){buildEnlargeSide();}
+    else{returnEnlargePanelCard();}
+    requestAnimationFrame(()=>{updateGrid();refreshPreview();});
+  };
+  $('btnEnlarge').addEventListener('click',()=>toggleEnlarge(true));
+  $('enlargeClose').addEventListener('click',()=>toggleEnlarge(false));
+  $('enlargeBackdrop').addEventListener('click',()=>toggleEnlarge(false));
+  // Quick Links tray
+  $('linksTab').addEventListener('click',()=>$('exportCard').classList.add('links-open'));
+  $('linksClose').addEventListener('click',()=>$('exportCard').classList.remove('links-open'));
+  $('linkAdd').addEventListener('click',addUserLink);
+  $('linkUrl').addEventListener('keydown',e=>{if(e.key==='Enter')addUserLink();});
+  loadUserLinks();
   // Art Bin
   $('artBinHead').addEventListener('click',e=>{if(e.target.id==='artBinAdd')return;toggleArtBin();});
   $('artBinAdd').addEventListener('click',e=>{e.stopPropagation();$('artBinFile').click();});
@@ -1958,10 +2213,19 @@ function init(){
   $('mkPanelSelect').addEventListener('change',e=>{mockup.active=e.target.value;mkRefreshChips();mkRenderCorners();});
   window.addEventListener('resize',()=>{updateGrid();if(mockup.baseImg){mkRedraw();mkRenderCorners();}});
   document.addEventListener('keydown',e=>{
-    if(e.key==='Escape'){$('finishedPopup').classList.remove('show');$('helpOverlay').classList.remove('show');$('cropPopup').classList.remove('show');}
+    if(e.key==='Escape'){$('finishedPopup').classList.remove('show');$('helpOverlay').classList.remove('show');$('cropPopup').classList.remove('show');if($('sheetWrap').classList.contains('enlarged')){returnEnlargePanelCard();$('sheetWrap').classList.remove('enlarged');$('enlargeBackdrop').classList.remove('show');document.body.classList.remove('enlarging');requestAnimationFrame(()=>{updateGrid();refreshPreview();});}}
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!e.shiftKey){e.preventDefault();undo();}
     else if((e.ctrlKey||e.metaKey)&&(e.key.toLowerCase()==='y'||(e.key.toLowerCase()==='z'&&e.shiftKey))){e.preventDefault();redo();}
     else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();saveKit();}
+    else if((e.key==='Delete'||e.key==='Backspace')){
+      // don't hijack typing in inputs/fields
+      const t=e.target;const typing=t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable);
+      if(!typing&&lastFocusPanel&&state.images[lastFocusPanel]){
+        e.preventDefault();
+        if(isLocked(lastFocusPanel)){toast('Panel is locked 🔒');}
+        else{removeImage(lastFocusPanel);}
+      }
+    }
   });
   // first-run help
   if(KV.available()){KV.get('seen-help').then(r=>{if(!r){$('helpOverlay').classList.add('show');KV.set('seen-help','1');}}).catch(()=>{});}
