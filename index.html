@@ -302,6 +302,17 @@ button{font-family:'Inter',sans-serif}
 .crop-btn-cancel:hover{background:var(--edge)}
 .crop-btn-apply{background:linear-gradient(135deg,var(--teal),#15a89c);border-color:transparent;color:#04211f;font-weight:700}
 .crop-btn-apply:hover{filter:brightness(1.07)}
+/* background removal controls */
+.bg-controls{padding:12px 2px 4px}
+.bg-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.bg-row label{font:600 12px 'Inter';color:var(--ink-dim);width:92px;flex-shrink:0}
+.bg-row input[type=range]{flex:1}
+.bg-target-row{display:flex;align-items:center;gap:9px;margin-top:4px}
+.bg-target-row .mini{font-size:11px;color:var(--ink-dim)}
+.bg-swatch{width:22px;height:22px;border-radius:5px;border:1px solid var(--edge);background:#fff;flex-shrink:0}
+.bg-mini-btn{font:600 11px 'Inter';padding:5px 10px;border-radius:6px;border:1px solid var(--edge);background:var(--panel2);color:var(--ink);cursor:pointer}
+.bg-mini-btn:hover{border-color:var(--teal);color:var(--teal)}
+.bg-hint{font-style:italic}
 .mockup-bar .mk-btn:hover{background:var(--edge)}
 .mockup-bar .mk-btn.primary{background:linear-gradient(135deg,var(--teal),#15a89c);border-color:transparent;color:#04211f}
 .mockup-sel{font:600 12px 'Inter';padding:7px 9px;border-radius:8px;border:1px solid var(--edge);background:var(--bg);color:var(--ink);cursor:pointer}
@@ -524,8 +535,10 @@ kbd{background:var(--bg);border:1px solid var(--edge);border-radius:4px;padding:
       <button data-act="save">💾 Save Kit <span>to library</span></button>
       <button data-act="file">📁 Save to File <span>.craneforge</span></button>
       <button data-act="template">📐 Save as Template <span>layout, no art</span></button>
+      <button data-act="drive">📤 Save to Google Drive <span>opens Drive</span></button>
       <div class="tb-dd-sep"></div>
       <button data-act="load">📂 Load from File <span>.craneforge</span></button>
+      <button data-act="loadlink">🔗 Load from link <span>shared kit URL</span></button>
     </div>
   </div>
   <input type="file" id="kitFileInput" accept=".craneforge,application/json" hidden>
@@ -698,6 +711,39 @@ kbd{background:var(--bg);border:1px solid var(--edge);border-radius:4px;padding:
       <button class="crop-btn-ghost" id="cropReset">Clear crop</button>
       <button class="crop-btn-cancel" id="cropCancel">Cancel</button>
       <button class="crop-btn-apply" id="cropApply">Apply crop</button>
+    </div>
+  </div>
+</div>
+
+<!-- BACKGROUND REMOVAL OVERLAY -->
+<div class="popup" id="bgPopup">
+  <div class="popup-box" style="max-width:720px">
+    <div class="popup-head"><h2>Remove background</h2><span class="mini" style="font-size:11px;font-weight:600;color:var(--ink-dim)">Click the background color to target it, then tune tolerance</span><button class="x" id="bgClose">✕</button></div>
+    <div id="bgStage" style="position:relative;background:var(--check);border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:200px">
+      <canvas id="bgCanvas" style="max-width:100%;max-height:56vh;display:block;cursor:crosshair"></canvas>
+    </div>
+    <div class="bg-controls">
+      <div class="bg-row">
+        <label>Tolerance</label>
+        <input type="range" id="bgTol" min="0" max="120" step="1" value="40">
+        <span class="eval" id="bgTolVal">40</span>
+      </div>
+      <div class="bg-row">
+        <label>Soften edges</label>
+        <input type="range" id="bgFeather" min="0" max="6" step="1" value="1">
+        <span class="eval" id="bgFeatherVal">1</span>
+      </div>
+      <div class="bg-target-row">
+        <span class="mini">Target color:</span>
+        <span class="bg-swatch" id="bgSwatch"></span>
+        <button class="bg-mini-btn" id="bgPickCorners" title="Sample the four corners">Auto (corners)</button>
+        <span class="mini bg-hint">or click the image</span>
+      </div>
+    </div>
+    <div class="crop-actions">
+      <button class="crop-btn-ghost" id="bgRevert">Revert</button>
+      <button class="crop-btn-cancel" id="bgCancel">Cancel</button>
+      <button class="crop-btn-apply" id="bgApply">Apply</button>
     </div>
   </div>
 </div>
@@ -1345,7 +1391,7 @@ function buildPanels(){
         `<div class="erow"><label>Brightness</label><input type="range" min="0" max="200" step="1" value="${e.bright}" oninput="setEdit('${p.id}','bright',parseInt(this.value))" onchange="snapshot()"><span class="eval" id="eval-bright-${p.id}">${e.bright}%</span></div>`+
         `<div class="erow"><label>Contrast</label><input type="range" min="0" max="200" step="1" value="${e.contrast}" oninput="setEdit('${p.id}','contrast',parseInt(this.value))" onchange="snapshot()"><span class="eval" id="eval-contrast-${p.id}">${e.contrast}%</span></div>`+
         `<div class="erow"><label>Saturation</label><input type="range" min="0" max="200" step="1" value="${e.sat}" oninput="setEdit('${p.id}','sat',parseInt(this.value))" onchange="snapshot()"><span class="eval" id="eval-sat-${p.id}">${e.sat}%</span></div>`+
-        `<div class="eflips"><button class="eflip${e.flipH?' on':''}" id="flipH-${p.id}" onclick="toggleFlip('${p.id}','h')">⇄ Flip H</button><button class="eflip${e.flipV?' on':''}" id="flipV-${p.id}" onclick="toggleFlip('${p.id}','v')">⇅ Flip V</button><button class="eflip${state.crops[p.id]?' on':''}" onclick="openCrop('${p.id}')" title="Crop image">✂ Crop</button><button class="ereset" onclick="resetEdit('${p.id}')">Reset</button></div>`+
+        `<div class="eflips"><button class="eflip${e.flipH?' on':''}" id="flipH-${p.id}" onclick="toggleFlip('${p.id}','h')">⇄ Flip H</button><button class="eflip${e.flipV?' on':''}" id="flipV-${p.id}" onclick="toggleFlip('${p.id}','v')">⇅ Flip V</button><button class="eflip${state.crops[p.id]?' on':''}" onclick="openCrop('${p.id}')" title="Crop image">✂ Crop</button><button class="eflip" onclick="openBgRemove('${p.id}')" title="Remove background">⬜ Remove BG</button><button class="ereset" onclick="resetEdit('${p.id}')">Reset</button></div>`+
       `</div>`+
       `<div class="acts">`+
         `<button class="b-up" onclick="triggerUpload('${p.id}')">Upload</button>`+
@@ -2085,6 +2131,90 @@ async function rebuildCropCache(id){
 function displaySrc(id){return cropCache[id]||state.images[id];}
 function clearCrop(){if(!cropState)return;delete state.crops[cropState.id];cropState.box=null;$('cropBox').style.display='none';}
 
+/* ═══ BACKGROUND REMOVAL ═══ */
+let bgState=null; // {id, srcImg, origData, target:[r,g,b]}
+function openBgRemove(id){
+  if(isLocked(id)){toast('Panel is locked 🔒');return;}
+  const src=state.images[id];if(!src){toast('Upload an image first');return;}
+  const img=new Image();
+  img.onload=()=>{
+    const cv=$('bgCanvas');
+    // cap working size for responsiveness; keep aspect
+    const maxDim=900;let w=img.width,h=img.height;
+    if(Math.max(w,h)>maxDim){const s=maxDim/Math.max(w,h);w=Math.round(w*s);h=Math.round(h*s);}
+    cv.width=w;cv.height=h;
+    const ctx=cv.getContext('2d',{willReadFrequently:true});
+    ctx.clearRect(0,0,w,h);ctx.drawImage(img,0,0,w,h);
+    const orig=ctx.getImageData(0,0,w,h);
+    bgState={id,ctx,w,h,origData:new Uint8ClampedArray(orig.data),target:null};
+    // default: sample the four corners (most common bg)
+    pickCornerTarget();
+    applyBgPreview();
+    $('bgPopup').classList.add('show');
+  };
+  img.src=src;
+}
+function pickCornerTarget(){
+  if(!bgState)return;const {origData:d,w,h}=bgState;
+  const pts=[[0,0],[w-1,0],[0,h-1],[w-1,h-1]];
+  let r=0,g=0,b=0;
+  pts.forEach(([x,y])=>{const i=(y*w+x)*4;r+=d[i];g+=d[i+1];b+=d[i+2];});
+  bgState.target=[Math.round(r/4),Math.round(g/4),Math.round(b/4)];
+  updateBgSwatch();
+}
+function updateBgSwatch(){if(!bgState||!bgState.target)return;const[r,g,b]=bgState.target;const s=$('bgSwatch');if(s)s.style.background=`rgb(${r},${g},${b})`;}
+function applyBgPreview(){
+  if(!bgState)return;
+  const {ctx,w,h,origData,target}=bgState;
+  const tol=parseInt($('bgTol').value);
+  const feather=parseInt($('bgFeather').value);
+  const out=ctx.createImageData(w,h);
+  const od=out.data;
+  const tol2=tol*tol*3; // compare against squared distance over 3 channels
+  for(let i=0;i<origData.length;i+=4){
+    const r=origData[i],g=origData[i+1],b=origData[i+2];
+    od[i]=r;od[i+1]=g;od[i+2]=b;
+    const dr=r-target[0],dg=g-target[1],db=b-target[2];
+    const dist2=dr*dr+dg*dg+db*db;
+    if(dist2<=tol2){od[i+3]=0;}        // within tolerance -> transparent
+    else od[i+3]=origData[i+3];
+  }
+  // simple feather: soften alpha at transparent/opaque borders
+  if(feather>0){
+    const a=new Uint8ClampedArray(w*h);
+    for(let p=0,j=3;p<w*h;p++,j+=4)a[p]=od[j];
+    for(let f=0;f<feather;f++){
+      const cp=a.slice();
+      for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
+        const p=y*w+x;
+        if(cp[p]>0&&cp[p]<255)continue;
+        const avg=(cp[p-1]+cp[p+1]+cp[p-w]+cp[p+w])>>2;
+        if(cp[p]===255&&avg<200)a[p]=avg;
+        else if(cp[p]===0&&avg>55)a[p]=avg;
+      }
+    }
+    for(let p=0,j=3;p<w*h;p++,j+=4)od[j]=a[p];
+  }
+  ctx.putImageData(out,0,0);
+}
+function bgCanvasClick(e){
+  if(!bgState)return;const cv=$('bgCanvas');const rect=cv.getBoundingClientRect();
+  const x=Math.round((e.clientX-rect.left)/rect.width*bgState.w);
+  const y=Math.round((e.clientY-rect.top)/rect.height*bgState.h);
+  const i=((Math.max(0,Math.min(bgState.h-1,y)))*bgState.w+Math.max(0,Math.min(bgState.w-1,x)))*4;
+  bgState.target=[bgState.origData[i],bgState.origData[i+1],bgState.origData[i+2]];
+  updateBgSwatch();applyBgPreview();
+}
+function applyBgRemove(){
+  if(!bgState)return;const id=bgState.id;
+  const url=bgState.ctx.canvas.toDataURL('image/png');
+  state.images[id]=url;
+  delete state.crops[id];delete cropCache[id];
+  $('bgPopup').classList.remove('show');bgState=null;
+  snapshot();buildPanels();refreshPreview();toast('Background removed ✓');
+}
+function revertBgPreview(){if(!bgState)return;$('bgTol').value=40;$('bgFeather').value=1;$('bgTolVal').textContent='40';$('bgFeatherVal').textContent='1';pickCornerTarget();applyBgPreview();}
+
 /* ═══ FINISHED KIT (clean proof, no chrome) ═══ */
 function fillCountText(){const filled=panels.filter(p=>state.images[p.id]).length;return `${filled} of ${panels.length}`;}
 function buildFinished(targetGridId){
@@ -2296,6 +2426,16 @@ function init(){
   ab.addEventListener('drop',e=>{e.preventDefault();ab.classList.remove('dragover');if(e.dataTransfer&&e.dataTransfer.files.length)addBinFiles(e.dataTransfer.files);});
   renderArtBin();
   $('taSkip').addEventListener('click',endTruckAnim);
+  // Background removal popup
+  $('bgClose').addEventListener('click',()=>{$('bgPopup').classList.remove('show');bgState=null;});
+  $('bgCancel').addEventListener('click',()=>{$('bgPopup').classList.remove('show');bgState=null;});
+  $('bgApply').addEventListener('click',applyBgRemove);
+  $('bgRevert').addEventListener('click',revertBgPreview);
+  $('bgPickCorners').addEventListener('click',()=>{pickCornerTarget();applyBgPreview();});
+  $('bgCanvas').addEventListener('click',bgCanvasClick);
+  $('bgTol').addEventListener('input',e=>{$('bgTolVal').textContent=e.target.value;applyBgPreview();});
+  $('bgFeather').addEventListener('input',e=>{$('bgFeatherVal').textContent=e.target.value;applyBgPreview();});
+  $('bgPopup').addEventListener('click',e=>{if(e.target===$('bgPopup')){$('bgPopup').classList.remove('show');bgState=null;}});
   // one-time attention glow so people notice the Merch Room (does not auto-open)
   if(!matchMedia('(prefers-reduced-motion:reduce)').matches){ab.classList.add('attn');setTimeout(()=>ab.classList.remove('attn'),5200);}
   $('helpOverlay').addEventListener('click',e=>{if(e.target===$('helpOverlay'))$('helpOverlay').classList.remove('show');});
@@ -2318,7 +2458,7 @@ function init(){
   $('mkPanelSelect').addEventListener('change',e=>{mockup.active=e.target.value;mkRefreshChips();mkRenderCorners();});
   window.addEventListener('resize',()=>{updateGrid();if(mockup.baseImg){mkRedraw();mkRenderCorners();}});
   document.addEventListener('keydown',e=>{
-    if(e.key==='Escape'){$('finishedPopup').classList.remove('show');$('helpOverlay').classList.remove('show');$('cropPopup').classList.remove('show');if($('sheetWrap').classList.contains('enlarged')){returnEnlargePanelCard();$('sheetWrap').classList.remove('enlarged');$('enlargeBackdrop').classList.remove('show');document.body.classList.remove('enlarging');requestAnimationFrame(()=>{updateGrid();refreshPreview();});}}
+    if(e.key==='Escape'){$('finishedPopup').classList.remove('show');$('helpOverlay').classList.remove('show');$('cropPopup').classList.remove('show');if($('bgPopup').classList.contains('show')){$('bgPopup').classList.remove('show');bgState=null;}if($('sheetWrap').classList.contains('enlarged')){returnEnlargePanelCard();$('sheetWrap').classList.remove('enlarged');$('enlargeBackdrop').classList.remove('show');document.body.classList.remove('enlarging');requestAnimationFrame(()=>{updateGrid();refreshPreview();});}}
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!e.shiftKey){e.preventDefault();undo();}
     else if((e.ctrlKey||e.metaKey)&&(e.key.toLowerCase()==='y'||(e.key.toLowerCase()==='z'&&e.shiftKey))){e.preventDefault();redo();}
     else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();saveKit();}
