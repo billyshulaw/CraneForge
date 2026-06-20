@@ -364,6 +364,8 @@ body.enlarging #sheetWrap.enlarged{top:72px}
 .epchip{display:flex;align-items:center;gap:7px;padding:5px 9px;border-radius:7px;border:1px solid var(--edge);background:var(--panel);margin-bottom:4px;cursor:pointer;font:600 11.5px 'Inter';color:var(--ink-dim)}
 .epchip:hover{border-color:var(--teal);color:var(--ink)}
 .epchip.active{border-color:var(--teal);color:var(--ink);background:var(--panel2)}
+.epchip.hl{border-color:var(--teal);color:var(--ink);background:rgba(34,211,197,.12)}
+.epchip.card-focus{border-color:var(--gold);color:var(--ink);box-shadow:0 0 0 1px var(--gold) inset}
 .epchip .epc-dot{width:15px;height:15px;border-radius:4px;background:var(--hot);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .epchip .epc-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .epchip .epc-chev{margin-left:auto;font-size:9px;color:var(--teal)}
@@ -1728,23 +1730,29 @@ let lastFocusPanel=null;
 function setFocusPanel(id){
   lastFocusPanel=id;
   document.querySelectorAll('.sp.focus-panel').forEach(s=>s.classList.remove('focus-panel'));
-  document.querySelectorAll('.slot.card-focus').forEach(s=>s.classList.remove('card-focus'));
+  document.querySelectorAll('.slot.card-focus,.epchip.card-focus').forEach(s=>s.classList.remove('card-focus'));
   const sp=document.querySelector(`[data-panel="${id}"]`);if(sp)sp.classList.add('focus-panel');
   const slot=$(`slot-${id}`);if(slot)slot.classList.add('card-focus');
+  const chip=$(`epchip-${id}`);if(chip)chip.classList.add('card-focus');
 }
-// transient cross-highlight: hovering a canvas panel OR its edit card lights up both
+// transient cross-highlight: hovering a canvas panel OR its edit card / enlarge-side row lights up all of them
 function hoverPanel(id){
-  document.querySelectorAll('.sp.hl,.slot.hl').forEach(s=>s.classList.remove('hl'));
+  document.querySelectorAll('.sp.hl,.slot.hl,.epchip.hl').forEach(s=>s.classList.remove('hl'));
   if(!id)return;
   const sp=document.querySelector(`.sp[data-panel="${id}"]`);if(sp)sp.classList.add('hl');
   const slot=$(`slot-${id}`);if(slot)slot.classList.add('hl');
+  const chip=$(`epchip-${id}`);if(chip)chip.classList.add('hl');
 }
 let _hlCur=null;
 document.addEventListener('mouseover',e=>{
   let id=null;
   const sp=e.target.closest&&e.target.closest('.sp[data-panel]');
   if(sp)id=sp.dataset.panel;
-  else{const slot=e.target.closest&&e.target.closest('.slot[id^="slot-"]');if(slot)id=slot.id.slice(5);}
+  else{
+    const slot=e.target.closest&&e.target.closest('.slot[id^="slot-"]');
+    if(slot)id=slot.id.slice(5);
+    else{const chip=e.target.closest&&e.target.closest('.epchip[id^="epchip-"]');if(chip)id=chip.id.slice(7);}
+  }
   if(id!==_hlCur){_hlCur=id;hoverPanel(id);}
 });
 function startPan(e,id){if(e.target.classList.contains('rh')||e.target.classList.contains('swap-h'))return;setFocusPanel(id);const img=$(`pv-${id}`);if(!img||img.style.display==='none')return;e.preventDefault();const pn=state.pans[id]||{x:50,y:50};activePan={id,x0:e.clientX,y0:e.clientY,px0:pn.x,py0:pn.y};document.body.style.cursor='grabbing';}
