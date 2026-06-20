@@ -111,7 +111,7 @@ button{font-family:'Inter',sans-serif}
 .add-btn-btm{width:100%;justify-content:center;height:38px;margin-top:10px}
 .add-btn-btm:hover{border-color:var(--teal);background:rgba(34,211,197,.07)}
 .add-btn:hover{border-color:var(--teal);background:rgba(34,211,197,.07)}
-.panel-list{flex:1;overflow-y:auto;padding:0 14px 14px;display:flex;flex-wrap:wrap;gap:9px;align-content:flex-start}
+.panel-list{flex:1;overflow-y:auto;padding:0 14px 14px;display:flex;flex-wrap:wrap;gap:9px;align-content:flex-start;align-items:stretch}
 
 /* SLOT */
 .slot{width:calc(50% - 5px);flex-shrink:0;background:var(--panel);border:1px solid var(--edge);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:border-color .15s}
@@ -123,7 +123,7 @@ button{font-family:'Inter',sans-serif}
 .slot.locked .thumb{pointer-events:none}
 .slot.locked .b-up,.slot.locked .b-rm{opacity:.4;pointer-events:none}
 
-.sh{display:flex;align-items:center;gap:7px;padding:9px 10px;cursor:pointer;user-select:none}
+.sh{display:flex;align-items:center;gap:7px;padding:9px 10px;cursor:pointer;user-select:none;min-height:50px;box-sizing:border-box}
 .sh:hover{background:var(--panel2)}
 .snum{width:21px;height:21px;background:linear-gradient(135deg,var(--hot),#c91d5c);color:#fff;border-radius:5px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sname{font-size:12px;font-weight:600;flex:1;line-height:1.2;outline:none}
@@ -134,7 +134,7 @@ button{font-family:'Inter',sans-serif}
 .slot.locked .lockb{filter:none}
 .chev{font-size:9px;color:var(--ink-dim);flex-shrink:0}
 
-.thumb{width:100%;height:118px;cursor:pointer;position:relative;flex-shrink:0;background:var(--check);overflow:hidden;transition:height .2s}
+.thumb{width:100%;height:140px;cursor:pointer;position:relative;flex-shrink:0;background:var(--check);overflow:hidden;transition:height .2s}
 .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:opacity .15s}
 .thumb.empty .ov{opacity:1;color:var(--ink-dim)}
@@ -197,7 +197,7 @@ button{font-family:'Inter',sans-serif}
 .ereset:hover{color:var(--hot);border-color:var(--hot)}
 
 /* ACTIONS */
-.acts{display:flex;gap:6px;padding:7px 8px 9px;flex-shrink:0}
+.acts{display:flex;gap:6px;padding:7px 8px 9px;flex-shrink:0;margin-top:auto}
 .acts button{font:600 11px 'Inter';padding:7px 6px;border-radius:7px;cursor:pointer;border:none}
 .b-up{flex:1;background:var(--panel2);border:1px solid var(--edge)!important;color:var(--ink)}.b-up:hover{background:var(--edge)}
 .b-rm{flex:0 0 auto;background:rgba(255,61,127,.12);color:var(--hot)}.b-rm:hover{background:rgba(255,61,127,.22)}
@@ -417,6 +417,9 @@ body.enlarging .artbin .artbin-strip{padding:2px 2px 3px 2px;gap:6px}
 .abi-ghost img{width:100%;height:100%;object-fit:cover}
 .slot.bin-target{outline:2px solid var(--teal);outline-offset:2px}
 .sp.focus-panel{outline:2px solid var(--gold);outline-offset:1px}
+.sp.hl{outline:2px dashed var(--teal);outline-offset:1px}
+.slot.card-focus{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.slot.hl{border-color:var(--teal)}
 /* TRUCK UNLOAD ANIMATION (plays in Merch Room when 5+ files added) */
 .truck-anim{display:none;position:relative;height:0;overflow:hidden;border-radius:10px;background:linear-gradient(180deg,#0c1220,#10182a);transition:height .25s ease}
 .truck-anim.show{display:block;height:210px;margin:4px 0 10px;border:1px solid var(--edge)}
@@ -1432,7 +1435,7 @@ function buildPanels(){
     const sBtns=SHAPES.map(s=>`<button class="sbtn${s.id===sh?' on':''}" data-s="${s.id}" onclick="event.stopPropagation();setShape('${p.id}','${s.id}')" title="${s.label}">${shapeIcon(s.id)}</button>`).join('');
     const el=document.createElement('div');el.className='slot'+(locked?' locked':'');el.id=`slot-${p.id}`;
     el.innerHTML=
-      `<div class="sh" onclick="toggleExpand('${p.id}')">`+
+      `<div class="sh" onclick="setFocusPanel('${p.id}');toggleExpand('${p.id}')">`+
         `<div class="snum">${idx+1}</div>`+
         `<div class="sname" contenteditable="true" spellcheck="false" onclick="event.stopPropagation()" onblur="renameLabel('${p.id}',this)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${getLabel(p)}</div>`+
         `<span class="sbadge" id="sb-${p.id}">${sh}</span>`+
@@ -1524,14 +1527,17 @@ function toggleArtBin(force){
   const open=force!==undefined?force:!ab.classList.contains('open');
   ab.classList.toggle('open',open);
 }
+let pendingReveal=new Set(); // bin items withheld until the truck delivers them
+function revealBinPending(){if(!pendingReveal.size)return;pendingReveal.clear();renderArtBin();}
 function renderArtBin(){
   const strip=$('artBinStrip'),empty=$('artBinEmpty'),count=$('artBinCount');
   if(!strip)return;
-  strip.innerHTML=artBin.map(it=>
+  const vis=artBin.filter(it=>!pendingReveal.has(it.id));
+  strip.innerHTML=vis.map(it=>
     `<div class="abi" data-bin="${it.id}" onmousedown="startBinDrag(event,'${it.id}')"><img src="${it.src}" alt=""><button class="abi-x" onmousedown="event.stopPropagation()" onclick="removeBinItem('${it.id}')">✕</button></div>`
   ).join('');
-  if(empty)empty.style.display=artBin.length?'none':'block';
-  if(count)count.textContent=artBin.length?`(${artBin.length})`:'';
+  if(empty)empty.style.display=vis.length?'none':'block';
+  if(count)count.textContent=vis.length?`(${vis.length})`:'';
 }
 function addBinFiles(files){
   const list=[...files].filter(f=>f.type.startsWith('image/'));
@@ -1541,7 +1547,10 @@ function addBinFiles(files){
   const added=[];
   list.forEach(f=>{
     const r=new FileReader();
-    r.onload=()=>{const item={id:'bin'+Date.now()+Math.random().toString(36).slice(2,6),src:r.result};artBin.push(item);added.push(item);if(--pending===0){renderArtBin();snapshot();if(bigBatch)playTruckAnim(added);}};
+    r.onload=()=>{const item={id:'bin'+Date.now()+Math.random().toString(36).slice(2,6),src:r.result};artBin.push(item);added.push(item);if(--pending===0){
+      if(bigBatch){revealBinPending();added.forEach(it=>pendingReveal.add(it.id));renderArtBin();snapshot();playTruckAnim(added);}
+      else{renderArtBin();snapshot();}
+    }};
     r.readAsDataURL(f);
   });
   toggleArtBin(true);
@@ -1587,13 +1596,14 @@ function playTruckAnim(items){
   },2200));
   stage2('stage-flat',3400,ta); // attendant flattened (keep files visible)
   stage2('stage-ok',4400,ta);   // pops up "I'm ok."
+  truckAnimTimers.push(setTimeout(revealBinPending,4200)); // delivered files now appear in the bin
   truckAnimTimers.push(setTimeout(()=>{ta.className='truck-anim show stage-ok stage-settle';},5900)); // truck pulls out
   truckAnimTimers.push(setTimeout(endTruckAnim,7000));
 }
 // stage that preserves the falling files (adds class without wiping file 'fly' state)
 function stage2(cls,t,ta){truckAnimTimers.push(setTimeout(()=>{ta.classList.remove('stage-in','stage-gate','stage-drop','stage-flat','stage-ok');ta.classList.add(cls);},t));}
 function clearTruckAnim(){truckAnimTimers.forEach(clearTimeout);truckAnimTimers=[];}
-function endTruckAnim(){const ta=$('truckAnim');if(!ta)return;clearTruckAnim();ta.classList.remove('show');ta.className='truck-anim';const fb=$('taFiles');if(fb)fb.innerHTML='';}
+function endTruckAnim(){revealBinPending();const ta=$('truckAnim');if(!ta)return;clearTruckAnim();ta.classList.remove('show');ta.className='truck-anim';const fb=$('taFiles');if(fb)fb.innerHTML='';}
 function removeBinItem(id){artBin=artBin.filter(b=>b.id!==id);renderArtBin();snapshot();}
 // drag a bin thumbnail onto a panel (card or preview cell)
 function startBinDrag(e,binId){
@@ -1718,8 +1728,25 @@ let lastFocusPanel=null;
 function setFocusPanel(id){
   lastFocusPanel=id;
   document.querySelectorAll('.sp.focus-panel').forEach(s=>s.classList.remove('focus-panel'));
+  document.querySelectorAll('.slot.card-focus').forEach(s=>s.classList.remove('card-focus'));
   const sp=document.querySelector(`[data-panel="${id}"]`);if(sp)sp.classList.add('focus-panel');
+  const slot=$(`slot-${id}`);if(slot)slot.classList.add('card-focus');
 }
+// transient cross-highlight: hovering a canvas panel OR its edit card lights up both
+function hoverPanel(id){
+  document.querySelectorAll('.sp.hl,.slot.hl').forEach(s=>s.classList.remove('hl'));
+  if(!id)return;
+  const sp=document.querySelector(`.sp[data-panel="${id}"]`);if(sp)sp.classList.add('hl');
+  const slot=$(`slot-${id}`);if(slot)slot.classList.add('hl');
+}
+let _hlCur=null;
+document.addEventListener('mouseover',e=>{
+  let id=null;
+  const sp=e.target.closest&&e.target.closest('.sp[data-panel]');
+  if(sp)id=sp.dataset.panel;
+  else{const slot=e.target.closest&&e.target.closest('.slot[id^="slot-"]');if(slot)id=slot.id.slice(5);}
+  if(id!==_hlCur){_hlCur=id;hoverPanel(id);}
+});
 function startPan(e,id){if(e.target.classList.contains('rh')||e.target.classList.contains('swap-h'))return;setFocusPanel(id);const img=$(`pv-${id}`);if(!img||img.style.display==='none')return;e.preventDefault();const pn=state.pans[id]||{x:50,y:50};activePan={id,x0:e.clientX,y0:e.clientY,px0:pn.x,py0:pn.y};document.body.style.cursor='grabbing';}
 function resetPan(id){state.pans[id]={x:50,y:50};const img=$(`pv-${id}`);if(img)img.style.objectPosition='50% 50%';snapshot();}
 function startResize(e,id){e.preventDefault();e.stopPropagation();if(isLocked(id)){toast('Panel is locked 🔒');return;}const el=document.querySelector(`[data-panel="${id}"]`);if(!el)return;const rect=el.getBoundingClientRect();const cw=getW(P(id)),ch=getH(P(id));activeResize={id,wStart:cw,hStart:ch,x0:e.clientX,y0:e.clientY,scaleW:cw/rect.width,scaleH:ch/rect.height};document.body.style.cursor='se-resize';}
