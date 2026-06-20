@@ -162,6 +162,8 @@ button{font-family:'Inter',sans-serif}
 .matchrow .match-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim)}
 .matchrow button{font:600 11px 'Inter';padding:4px 9px;border-radius:6px;border:1px solid var(--edge);background:var(--panel2);color:var(--ink-dim);cursor:pointer;transition:all .12s}
 .matchrow button:hover{color:var(--teal);border-color:var(--teal);background:rgba(34,211,197,.08)}
+.matchrow button.mb-mirror{color:var(--teal);border-color:rgba(34,211,197,.4);background:rgba(34,211,197,.07)}
+.matchrow button.mb-mirror:hover{background:rgba(34,211,197,.16);border-color:var(--teal)}
 .rlock+.rst{margin-left:4px}
 
 /* SHAPES */
@@ -821,7 +823,7 @@ kbd{background:var(--bg);border:1px solid var(--edge);border-radius:4px;padding:
         <ul>
           <li><b>🔗 Lock-ratio</b> (next to the W field): when ON, width and height scale together so the panel keeps its proportions — change one, the other follows. When OFF (default), they're independent. Turn it on when you want to resize without distorting the art's aspect.</li>
           <li><b>↺ Reset</b> appears when a panel differs from its default size — click to restore it.</li>
-          <li><b>Fit buttons</b> (under the H field): one-click tiling helpers that do the math for you. A side banner shows <b>↕ Fill column height</b> (sizes it to match header + main stacked) and <b>⧉ Match other side</b>. The header and main panel show <b>↔ Match width</b> to each other. Use these to make panels line up flush with no gaps.</li>
+          <li><b>Fit buttons</b> (under the H field): one-click helpers that do the math for you. A side banner shows <b>↕ Fill column height</b> (sizes it to match header + main stacked). Once a side banner has artwork, it also shows <b>⧉ Mirror to other side</b> — this copies the art, size, crop and all image edits onto the opposite banner and flips it horizontally, so your two sides become a matched mirrored pair. The header and main panel show <b>↔ Match width</b> to each other. Use these to make panels line up flush with no gaps.</li>
         </ul>
         <div class="tip">For a clean, gap-free finished layout, panel sizes need to fit together — e.g. the side banners as tall as the header + main panel stacked. The <b>Fit</b> buttons do exactly this in one click, or measure the real machine and enter the numbers directly.</div>
       </div>
@@ -1261,7 +1263,7 @@ function matchBtns(id){
   if(id==='sideLeft'||id==='sideRight'){
     if(has('header')&&has('mainFront')) btns.push(`<button onclick="event.stopPropagation();fillColumnHeight('${id}')">↕ Fill column height</button>`);
     const other=id==='sideLeft'?'sideRight':'sideLeft';
-    if(has(other)) btns.push(`<button onclick="event.stopPropagation();matchDim('${id}','both','${other}','both')">⧉ Match other side</button>`);
+    if(has(other)&&state.images[id]) btns.push(`<button class="mb-mirror" onclick="event.stopPropagation();makeMatchingSide('${id}')" title="Copy this side's art, size & edits to the other banner — mirrored horizontally">⧉ Mirror to other side</button>`);
   }
   if(!btns.length) return '';
   return `<div class="matchrow"><span class="match-lbl">Fit</span>${btns.join('')}</div>`;
@@ -1290,6 +1292,55 @@ function fillColumnHeight(id){
   state.dims[id].h=target;
   syncDimInputs(id);refreshRst(id);updateGrid();updatePrintInfo();snapshot();
   toast('Filled column height ✓');
+}
+
+/* ═══ COPY / MIRROR PANEL SETTINGS — powers Matching Side (#3) and Copy Image Settings (#4) ═══ */
+// Copies a panel's full setup onto another panel. opts.mirror=true produces a true horizontal mirror.
+// opts.fields (array) limits which groups copy: 'image','dims','shape','edits','pan','crop'. null = all.
+function copyPanelSettings(srcId,tgtId,opts){
+  opts=opts||{};
+  const mirror=!!opts.mirror, fields=opts.fields||null, includeImage=opts.includeImage!==false;
+  const want=g=>!fields||fields.includes(g);
+  if(want('image')&&includeImage){
+    if(state.images[srcId]!==undefined)state.images[tgtId]=state.images[srcId];
+    else delete state.images[tgtId];
+  }
+  if(want('dims')){
+    if(state.dims[srcId])state.dims[tgtId]=JSON.parse(JSON.stringify(state.dims[srcId]));
+    if(state.ratioLock[srcId]!==undefined)state.ratioLock[tgtId]=state.ratioLock[srcId];
+  }
+  if(want('shape')&&state.shapes[srcId]!==undefined)state.shapes[tgtId]=state.shapes[srcId];
+  if(want('edits')){
+    const se=state.edits[srcId]?JSON.parse(JSON.stringify(state.edits[srcId])):defaultEdit();
+    if(mirror){se.flipH=!se.flipH;se.rotate=-(se.rotate||0);}  // true horizontal mirror
+    state.edits[tgtId]=se;
+  }
+  if(want('pan')){
+    const sp=state.pans[srcId]?{x:state.pans[srcId].x,y:state.pans[srcId].y}:{x:50,y:50};
+    if(mirror)sp.x=100-(sp.x==null?50:sp.x);  // mirror framing so the pair is symmetric
+    state.pans[tgtId]=sp;
+  }
+  if(want('crop')){
+    // crop copied as-is — flipH already mirrors the cropped content; mirroring the box too would double-flip
+    if(state.crops[srcId])state.crops[tgtId]={...state.crops[srcId]};
+    else delete state.crops[tgtId];
+  }
+  delete cropCache[tgtId]; // force the cropped-image cache to rebuild for the target
+}
+
+// #3 — one smart button on each side banner: mirror this side's art + settings onto the opposite banner.
+function makeMatchingSide(srcId){
+  const tgtId=srcId==='sideLeft'?'sideRight':'sideLeft';
+  if(!P(tgtId)){toast('Other side panel not found');return;}
+  if(isLocked(tgtId)){toast('Other side is locked 🔒 — unlock it first');return;}
+  if(!state.images[srcId]){toast('Add artwork to this side first');return;}
+  const editedTgt=state.edits[tgtId]&&JSON.stringify(state.edits[tgtId])!==JSON.stringify(defaultEdit());
+  const tgtHas=!!state.images[tgtId]||!!state.crops[tgtId]||editedTgt;
+  if(tgtHas&&!confirm('The other side already has artwork or edits.\n\nOverwrite it with a mirror of this side?'))return;
+  copyPanelSettings(srcId,tgtId,{mirror:true});
+  snapshot();buildPanels();buildPreviewNodes();initClips();refreshPreview();updateGrid();updatePrintInfo();buildSpec();
+  const tgtName=tgtId==='sideLeft'?'left':'right';
+  toast('Mirrored to '+tgtName+' side ✓');
 }
 
 /* ═══ LOCK ═══ */
